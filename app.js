@@ -61,6 +61,19 @@ function selectText(id) {
   document.getElementById('practice-title-text').textContent = saved[id].title;
   renderSidebar();
   renderText();
+  closeSidebar();
+}
+
+/* ---- モバイル：サイドバー開閉 ---- */
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const isOpen  = sidebar.classList.toggle('sidebar-open');
+  overlay.classList.toggle('show', isOpen);
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('sidebar-open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
 }
 
 /* ---- フォーム表示 ---- */
@@ -70,6 +83,7 @@ function showForm() {
   document.getElementById('textInput').value  = '';
   document.getElementById('view-form').style.display     = 'flex';
   document.getElementById('view-practice').style.display = 'none';
+  closeSidebar();
   renderSidebar();
 }
 

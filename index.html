@@ -17,6 +17,16 @@
 </head>
 <body>
 
+  <!-- モバイル: ハンバーガーボタン＆オーバーレイ -->
+  <button id="btn-hamburger" onclick="toggleSidebar()" aria-label="メニュー">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <rect x="2" y="4"  width="16" height="2" rx="1" fill="currentColor"/>
+      <rect x="2" y="9"  width="16" height="2" rx="1" fill="currentColor"/>
+      <rect x="2" y="14" width="16" height="2" rx="1" fill="currentColor"/>
+    </svg>
+  </button>
+  <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
   <!-- 左ペイン -->
   <div id="sidebar">
     <div id="sidebar-header">
