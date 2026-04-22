@@ -893,4 +893,23 @@ body.hide-charcount .char-count { display: none; }
 
   /* テキスト行の行番号 */
   .line-num { display: none; }
+
+  /* テキスト表示の調整 */
+  #text-display {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+  .text-line {
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .token.hidden {
+    line-height: 1.4;
+    min-width: 1em;
+  }
+  .word-group {
+    display: inline-flex;
+    align-items: center;
+  }
 }
