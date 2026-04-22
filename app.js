@@ -269,7 +269,9 @@ function setMode(btn) {
   document.getElementById('btn-rewind').style.display   = isTyping ? 'none' : '';
   document.getElementById('btn-forward').style.display  = isTyping ? 'none' : '';
   document.body.classList.toggle('typing-mode', isTyping);
+  document.body.classList.toggle('typing-seq', isTyping && typingSub === 'seq');
   document.body.classList.toggle('reveal-mode', ['word','sentence','first'].includes(currentMode));
+  updateMobileBar();
   renderText();
 }
 
@@ -568,13 +570,16 @@ function jumpToSection(e, btn) {
 }
 
 /* ========== テストモード ========== */
-let typingSub  = 'seq';
-let typingDone = {};
+let typingSub      = 'seq';
+let typingDone     = {};
+let currentTypingIdx = 0;
 
 function setTypingSub(btn) {
   typingSub = btn.dataset.sub;
   document.querySelectorAll('.btn-submode').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  document.body.classList.toggle('typing-seq', typingSub === 'seq');
+  updateMobileBar();
   renderText();
 }
 
@@ -585,6 +590,29 @@ function toggleCharCount(btn) {
   document.body.classList.toggle('hide-charcount', !showCharCount);
   btn.classList.toggle('active', showCharCount);
   btn.textContent = showCharCount ? '文字数 表示' : '文字数 非表示';
+}
+
+/* ---- モバイル下部バー：ラベル更新・アクション振り分け ---- */
+function updateMobileBar() {
+  const fwd = document.getElementById('mb-btn-forward');
+  if (!fwd) return;
+  fwd.textContent = (currentMode === 'typing' && typingSub === 'seq') ? '次へ →' : '進む →';
+}
+
+function mobileBack(e) {
+  if (currentMode === 'typing' && typingSub === 'seq') {
+    if (currentTypingIdx > 0) backLine(currentTypingIdx);
+  } else {
+    rewindOne(e);
+  }
+}
+
+function mobileForward(e) {
+  if (currentMode === 'typing' && typingSub === 'seq') {
+    submitLine(currentTypingIdx);
+  } else {
+    revealNext({ target: document.getElementById('practice-body') });
+  }
 }
 
 /* 文字数ラベル更新（現在入力数/目標文字数） */
@@ -599,6 +627,7 @@ function renderTyping(text) {
   const el   = document.getElementById('text-display');
   const hint = document.getElementById('practice-hint');
   typingDone = {};
+  currentTypingIdx = 0;
   hint.innerHTML = typingSub === 'seq'
     ? '💡 入力して <kbd>次へ →</kbd> または <kbd>Enter 長押し</kbd> で確定 ／ 空欄で <kbd>BS 長押し</kbd> または <kbd>← 戻る</kbd> で前の行に戻れます'
     : '💡 全ての行を入力したら下の <kbd>答え合わせをする</kbd> を押してください';
@@ -721,6 +750,7 @@ function submitLine(idx) {
   const input = document.getElementById(`tinput-${idx}`);
   if (!input) return;
   typingDone[idx] = true;
+  currentTypingIdx = idx + 1;
   updateFeedback(idx, input.dataset.original, input.value, true);
   document.querySelector(`#tline-${idx} .typing-original`)?.classList.add('revealed');
   const btn = document.getElementById(`tbtn-${idx}`);
@@ -741,6 +771,8 @@ function submitLine(idx) {
 
 /* 1行戻る（順番入力） */
 function backLine(idx) {
+  if (idx <= 0) return;
+  currentTypingIdx = idx - 1;
   document.getElementById(`tline-${idx}`)?.style && (document.getElementById(`tline-${idx}`).style.display = 'none');
   const prevInput = document.getElementById(`tinput-${idx - 1}`);
   const prevLine  = document.getElementById(`tline-${idx - 1}`);

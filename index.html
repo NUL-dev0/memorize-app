@@ -114,10 +114,10 @@
 
   </div>
 
-  <!-- モバイル: フローティング下部バー（隠しモード用） -->
+  <!-- モバイル: フローティング下部バー（隠しモード・テスト順番入力用） -->
   <div id="mobile-bottom-bar">
-    <button class="mb-btn" onclick="rewindOne(event)">← 戻る</button>
-    <button class="mb-btn primary" onclick="revealNext({target:document.getElementById('practice-body')})">進む →</button>
+    <button class="mb-btn" id="mb-btn-back" onclick="mobileBack(event)">← 戻る</button>
+    <button class="mb-btn primary" id="mb-btn-forward" onclick="mobileForward(event)">進む →</button>
   </div>
 
   <script src="app.js"></script>

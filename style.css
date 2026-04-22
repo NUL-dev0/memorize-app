@@ -920,7 +920,7 @@ body.hide-charcount .char-count { display: none; }
     -webkit-overflow-scrolling: touch;
   }
   #mode-bar::-webkit-scrollbar { display: none; }
-  #mode-bar > div:last-child { display: none; } /* 戻る/進むグループ非表示 */
+  #mode-bar > div:last-child { display: none !important; } /* 戻る/進むグループ非表示（inline styleを上書き） */
   .btn-mode {
     white-space: nowrap;
     flex-shrink: 0;
@@ -967,6 +967,9 @@ body.hide-charcount .char-count { display: none; }
   .btn-next-line { padding: 10px 20px; min-height: 46px; font-size: 0.9rem; }
   .btn-back-line { padding: 10px 16px; min-height: 46px; font-size: 0.9rem; }
   .typing-input  { font-size: 1rem; padding: 10px 12px; }
+  /* 順番入力：行内の次へ/戻るボタンを非表示（下部バーに移動） */
+  body.typing-seq .btn-next-line,
+  body.typing-seq .btn-back-line { display: none !important; }
 
   /* ===== フローティング下部バー（隠しモード用） ===== */
   #mobile-bottom-bar {
@@ -979,7 +982,8 @@ body.hide-charcount .char-count { display: none; }
     border-top: 1px solid var(--border);
     z-index: 50;
   }
-  body.reveal-mode #mobile-bottom-bar { display: flex; }
+  body.reveal-mode #mobile-bottom-bar,
+  body.typing-seq  #mobile-bottom-bar  { display: flex; }
 
   .mb-btn {
     flex: 1;
@@ -1021,11 +1025,10 @@ body.hide-charcount .char-count { display: none; }
     padding-top: max(16px, env(safe-area-inset-top, 16px));
   }
 
-  /* ===== reveal-mode 時のパディングを増やして文字が隠れないように ===== */
-  body.reveal-mode #practice-body {
-    padding-bottom: 100px;
-  }
+  /* ===== フローティングバー表示時はパディングを確保 ===== */
+  body.reveal-mode #practice-body,
+  body.typing-seq  #practice-body  { padding-bottom: 100px; }
 
   /* ===== モードバーの戻る/進むグループを非表示（フローティングバーが代替） ===== */
-  #mode-bar > div:last-child { display: none; }
+  #mode-bar > div:last-child { display: none !important; }
 }
