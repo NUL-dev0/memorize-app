@@ -811,9 +811,7 @@ body.hide-charcount .char-count { display: none; }
 }
 
 /* ===== スマホ対応 ===== */
-#btn-hamburger {
-  display: none;
-}
+#btn-hamburger { display: none; }
 #sidebar-overlay {
   display: none;
   position: fixed;
@@ -823,8 +821,12 @@ body.hide-charcount .char-count { display: none; }
 }
 #sidebar-overlay.show { display: block; }
 
+/* フローティング下部バー（デスクトップでは非表示） */
+#mobile-bottom-bar { display: none; }
+
 @media (max-width: 768px) {
-  /* ハンバーガーボタン */
+
+  /* ===== ハンバーガーボタン ===== */
   #btn-hamburger {
     display: flex;
     align-items: center;
@@ -843,12 +845,10 @@ body.hide-charcount .char-count { display: none; }
     flex-shrink: 0;
   }
 
-  /* サイドバー：オフスクリーンからスライドイン */
+  /* ===== サイドバー ===== */
   #sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
+    top: 0; left: 0; bottom: 0;
     z-index: 200;
     height: 100%;
     width: 280px;
@@ -857,59 +857,114 @@ body.hide-charcount .char-count { display: none; }
   }
   #sidebar.sidebar-open { transform: translateX(0); }
 
-  /* TOCパネル非表示 */
+  /* ===== TOCパネル非表示 ===== */
   #toc-panel { display: none; }
 
-  /* ヘッダー：ハンバーガー分のスペース確保 */
-  #practice-header { padding-left: 66px; }
+  /* ===== プラクティスヘッダー ===== */
+  #practice-header {
+    padding: 10px 12px 10px 66px;
+    gap: 8px;
+  }
+  #practice-title-text { font-size: 0.88rem; }
+  .btn-delete { display: none; }        /* 削除ボタン非表示（誤タップ防止） */
+  .btn-icon { padding: 8px 14px; min-height: 40px; }
 
-  /* フォーム画面：ハンバーガー分のスペース確保 */
-  #view-form { padding-top: 70px; }
+  /* ===== ヒント文非表示 ===== */
+  #practice-hint { display: none; }
 
-  /* モードバー */
-  #mode-bar { padding: 8px 12px; gap: 6px; }
-  .btn-mode  { padding: 8px 12px; font-size: 0.82rem; min-height: 38px; }
-  .btn-rewind { padding: 8px 12px; min-height: 38px; }
-
-  /* タイピングバー */
-  #typing-bar { padding: 8px 12px; }
-  .btn-submode { padding: 7px 12px; min-height: 38px; }
-
-  /* 次へ・戻るボタン（順番入力）*/
-  .btn-next-line, .btn-back-line {
-    padding: 10px 18px;
-    font-size: 0.9rem;
-    min-height: 44px;
+  /* ===== モードバー: 1行横スクロール ===== */
+  #mode-bar {
+    padding: 8px 12px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 8px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  #mode-bar::-webkit-scrollbar { display: none; }
+  #mode-bar > div:last-child { display: none; } /* 戻る/進むグループ非表示 */
+  .btn-mode {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 8px 16px;
+    min-height: 40px;
+    font-size: 0.85rem;
   }
 
-  /* 入力欄 */
-  .typing-input { font-size: 1rem; padding: 10px 12px; }
+  /* ===== タイピングバー ===== */
+  #typing-bar { padding: 8px 12px; gap: 8px; }
+  .btn-submode { padding: 8px 16px; min-height: 40px; font-size: 0.85rem; }
+  .btn-charcount-toggle { display: none; } /* 文字数トグル非表示 */
+  #typing-score { margin-left: 0; }
 
-  /* practice-body の余白を小さく */
-  #practice-body { padding: 20px 16px; }
-
-  /* フォームカード */
-  .form-card { padding: 20px 16px; }
-
-  /* テキスト行の行番号 */
-  .line-num { display: none; }
-
-  /* テキスト表示の調整 */
-  #text-display {
-    font-size: 1rem;
-    line-height: 1.8;
+  /* ===== セクションラベル ===== */
+  .section-line { display: none; }     /* 横線非表示でここからが自然に左寄り */
+  .btn-section-jump {
+    padding: 5px 12px;
+    min-height: 32px;
+    font-size: 0.78rem;
   }
+
+  /* ===== テキスト表示 ===== */
+  #text-display { font-size: 1rem; line-height: 1.9; }
   .text-line {
     align-items: center;
     gap: 4px;
     flex-wrap: wrap;
   }
-  .token.hidden {
-    line-height: 1.4;
-    min-width: 1em;
+  .text-line::before { min-width: 1.2em; font-size: 0.65rem; }
+  .token.hidden { line-height: 1.4; min-width: 1em; }
+  .word-group { display: inline-flex; align-items: center; }
+
+  /* ===== practice-body ===== */
+  /* reveal-mode 時はフローティングバー分のパディングを確保 */
+  body.reveal-mode #practice-body { padding-bottom: 90px; }
+  #practice-body { padding: 16px 16px 20px; }
+
+  /* ===== フォーム画面 ===== */
+  #view-form { padding-top: 70px; }
+  .form-card { padding: 20px 16px; }
+
+  /* ===== タイピング入力 ===== */
+  .btn-next-line { padding: 10px 20px; min-height: 46px; font-size: 0.9rem; }
+  .btn-back-line { padding: 10px 16px; min-height: 46px; font-size: 0.9rem; }
+  .typing-input  { font-size: 1rem; padding: 10px 12px; }
+
+  /* ===== フローティング下部バー（隠しモード用） ===== */
+  #mobile-bottom-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    display: none;           /* JS で reveal-mode 時に flex に切り替え */
+    gap: 10px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 50;
   }
-  .word-group {
-    display: inline-flex;
+  body.reveal-mode #mobile-bottom-bar { display: flex; }
+
+  .mb-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 0.95rem;
+    cursor: pointer;
+    min-height: 52px;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 6px;
+    -webkit-tap-highlight-color: transparent;
   }
+  .mb-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  .mb-btn:active { opacity: 0.75; }
 }
