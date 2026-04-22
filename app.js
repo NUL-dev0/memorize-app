@@ -23,11 +23,124 @@ function renderSidebar() {
   el.innerHTML = keys.map(id => {
     const item    = saved[id];
     const preview = item.text.replace(/\n/g, ' ').slice(0, 30) + (item.text.length > 30 ? '…' : '');
-    return `<div class="thread-item${id === currentId ? ' active' : ''}" onclick="selectText('${id}')">
-      <div class="thread-title">${esc(item.title)}</div>
-      <div class="thread-preview">${esc(preview)}</div>
+    return `<div class="thread-row" data-id="${id}">
+      <div class="thread-delete-bg">
+        <button class="thread-delete-btn" onclick="confirmDeleteFromSwipe('${id}')">
+          <span>🗑</span><span>削除</span>
+        </button>
+      </div>
+      <div class="thread-item${id === currentId ? ' active' : ''}" onclick="onThreadItemClick(event,'${id}')">
+        <div class="thread-title">${esc(item.title)}</div>
+        <div class="thread-preview">${esc(preview)}</div>
+      </div>
     </div>`;
   }).join('');
+
+  if (window.innerWidth <= 768) {
+    initSwipeDelete();
+    showSwipeDeleteHint();
+  }
+}
+
+/* ---- スレッドアイテムクリック（スワイプ中は閉じるだけ） ---- */
+function onThreadItemClick(e, id) {
+  const row = e.currentTarget.closest('.thread-row');
+  if (row && row.classList.contains('swiped')) {
+    resetSwipedRow(row);
+    return;
+  }
+  selectText(id);
+}
+
+/* ---- スワイプ削除：タッチイベント設定 ---- */
+function initSwipeDelete() {
+  document.querySelectorAll('.thread-row').forEach(row => {
+    const item = row.querySelector('.thread-item');
+    if (!item) return;
+    let startX = 0, startY = 0, tracking = false;
+
+    item.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      tracking = true;
+    }, { passive: true });
+
+    item.addEventListener('touchmove', e => {
+      if (!tracking) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = Math.abs(e.touches[0].clientY - startY);
+      if (dy > 10) { tracking = false; return; }
+      if (dx < -8) {
+        const clamped = Math.max(-72, dx);
+        item.style.transform = `translateX(${clamped}px)`;
+        item.style.transition = 'none';
+      }
+    }, { passive: true });
+
+    item.addEventListener('touchend', e => {
+      if (!tracking) return;
+      tracking = false;
+      const dx = e.changedTouches[0].clientX - startX;
+      if (dx < -40) {
+        openSwipedRow(row);
+      } else {
+        resetSwipedRow(row);
+      }
+    }, { passive: true });
+  });
+
+  /* 他の行をタップしたら開いている行を閉じる */
+  document.getElementById('thread-list').addEventListener('touchstart', e => {
+    const row = e.target.closest('.thread-row');
+    document.querySelectorAll('.thread-row.swiped').forEach(r => {
+      if (r !== row) resetSwipedRow(r);
+    });
+  }, { passive: true });
+}
+
+function openSwipedRow(row) {
+  const item = row.querySelector('.thread-item');
+  row.classList.add('swiped');
+  item.style.transition = 'transform 0.2s ease';
+  item.style.transform = 'translateX(-72px)';
+}
+
+function resetSwipedRow(row) {
+  const item = row.querySelector('.thread-item');
+  row.classList.remove('swiped');
+  item.style.transition = 'transform 0.2s ease';
+  item.style.transform = '';
+}
+
+/* ---- 初回スワイプ削除ヒント ---- */
+function showSwipeDeleteHint() {
+  if (localStorage.getItem('swipe_delete_hinted')) return;
+  const firstRow = document.querySelector('.thread-row');
+  if (!firstRow) return;
+  localStorage.setItem('swipe_delete_hinted', '1');
+  setTimeout(() => {
+    openSwipedRow(firstRow);
+    setTimeout(() => resetSwipedRow(firstRow), 1200);
+  }, 800);
+}
+
+/* ---- スワイプ削除確認 ---- */
+function confirmDeleteFromSwipe(id) {
+  const saved = getAll();
+  const title = saved[id]?.title || 'このテキスト';
+  if (!confirm(`「${title}」を削除しますか？\nこの操作は元に戻せません。`)) {
+    const row = document.querySelector(`.thread-row[data-id="${id}"]`);
+    if (row) resetSwipedRow(row);
+    return;
+  }
+  delete saved[id];
+  setAll(saved);
+  if (currentId === id) {
+    currentId = null;
+    showForm();
+  } else {
+    renderSidebar();
+  }
 }
 
 /* ---- 保存 ---- */
@@ -131,6 +244,8 @@ function editCurrent() {
   document.getElementById('textInput').value  = item.text;
   document.getElementById('view-form').style.display     = 'flex';
   document.getElementById('view-practice').style.display = 'none';
+  document.body.classList.remove('reveal-mode'); // フローティングバーを隠す
+  closeSidebar();
 }
 
 /* ---- 削除 ---- */
