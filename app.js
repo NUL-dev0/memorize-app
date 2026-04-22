@@ -76,6 +76,41 @@ function closeSidebar() {
   document.getElementById('sidebar-overlay').classList.remove('show');
 }
 
+/* ---- モバイル：スワイプジェスチャー ---- */
+;(function() {
+  let startX = 0, startY = 0, maySwipe = false;
+  document.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    const sidebar = document.getElementById('sidebar');
+    maySwipe = startX < 36 || sidebar.classList.contains('sidebar-open');
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (!maySwipe) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = Math.abs(e.changedTouches[0].clientY - startY);
+    if (dy > 80) return; // 縦スクロールは無視
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar.classList.contains('sidebar-open') && dx > 56 && startX < 36) toggleSidebar();
+    else if (sidebar.classList.contains('sidebar-open') && dx < -56) toggleSidebar();
+    maySwipe = false;
+  }, { passive: true });
+})();
+
+/* ---- 初回起動時：エッジハンドルを一瞬点灯してスワイプを示唆 ---- */
+if (!localStorage.getItem('swipe_hinted') && window.innerWidth <= 768) {
+  setTimeout(() => {
+    const btn = document.getElementById('btn-hamburger');
+    if (!btn) return;
+    btn.style.transition = 'opacity 0.4s';
+    btn.style.opacity = '0.9';
+    setTimeout(() => {
+      btn.style.opacity = '';
+      localStorage.setItem('swipe_hinted', '1');
+    }, 1800);
+  }, 600);
+}
+
 /* ---- フォーム表示 ---- */
 function showForm() {
   currentId = null;
@@ -340,8 +375,10 @@ function scrollLineToCenter(lineEl) {
   if (!lineEl || !body) return;
   const bodyRect = body.getBoundingClientRect();
   const lineRect = lineEl.getBoundingClientRect();
-  const targetY  = body.scrollTop + (lineRect.top - bodyRect.top) - body.clientHeight / 2;
-  body.scrollTo({ top: targetY, behavior: 'smooth' });
+  // モバイルは上1/4に配置（キーボードと被らないよう）、デスクトップは中央
+  const ratio   = window.innerWidth <= 768 ? 0.22 : 0.5;
+  const targetY = body.scrollTop + (lineRect.top - bodyRect.top) - body.clientHeight * ratio;
+  body.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
 }
 
 /* ---- 1つ戻す ---- */

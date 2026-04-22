@@ -17,12 +17,12 @@
 </head>
 <body>
 
-  <!-- モバイル: ハンバーガーボタン＆オーバーレイ -->
+  <!-- モバイル: サイドバーエッジハンドル＆オーバーレイ -->
   <button id="btn-hamburger" onclick="toggleSidebar()" aria-label="メニュー">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <rect x="2" y="4"  width="16" height="2" rx="1" fill="currentColor"/>
-      <rect x="2" y="9"  width="16" height="2" rx="1" fill="currentColor"/>
-      <rect x="2" y="14" width="16" height="2" rx="1" fill="currentColor"/>
+    <svg width="10" height="24" viewBox="0 0 10 24" fill="none">
+      <rect x="3" y="4"  width="4" height="4" rx="2" fill="currentColor"/>
+      <rect x="3" y="10" width="4" height="4" rx="2" fill="currentColor"/>
+      <rect x="3" y="16" width="4" height="4" rx="2" fill="currentColor"/>
     </svg>
   </button>
   <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -93,8 +93,8 @@
           <button class="btn-mode" data-mode="typing"   onclick="setMode(this)">✏ テスト</button>
         </div>
         <div style="display:flex;gap:6px;">
-          <button class="btn-rewind" id="btn-rewind" onclick="rewindOne(event)" title="ひとつ戻す（Backspace）">↩ 戻る</button>
-          <button class="btn-rewind" id="btn-forward" onclick="forwardOne(event)" title="ひとつ進む（Space / Enter）">進む ↪</button>
+          <button class="btn-rewind" id="btn-rewind" onclick="rewindOne(event)" title="ひとつ戻す（Backspace）">← 戻る</button>
+          <button class="btn-rewind" id="btn-forward" onclick="forwardOne(event)" title="ひとつ進む（Space / Enter）">進む →</button>
         </div>
       </div>
       <div id="typing-bar">
@@ -116,8 +116,8 @@
 
   <!-- モバイル: フローティング下部バー（隠しモード用） -->
   <div id="mobile-bottom-bar">
-    <button class="mb-btn" onclick="rewindOne(event)">↩ 戻る</button>
-    <button class="mb-btn primary" onclick="revealNext({target:document.getElementById('practice-body')})">進む ↪</button>
+    <button class="mb-btn" onclick="rewindOne(event)">← 戻る</button>
+    <button class="mb-btn primary" onclick="revealNext({target:document.getElementById('practice-body')})">進む →</button>
   </div>
 
   <script src="app.js"></script>
