@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>暗記アプリ</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="description" content="歌詞・セリフ・詩を楽しく暗記できるWebアプリ。単語隠し・一文隠し・タイピングテストなど複数モードで効率的に練習できます。">
+  <meta property="og:title" content="暗記アプリ">
+  <meta property="og:description" content="歌詞・セリフ・詩を楽しく暗記できるWebアプリ。単語隠し・一文隠し・タイピングテストなど複数モードで効率的に練習できます。">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="暗記アプリ">
+  <meta name="twitter:description" content="歌詞・セリフ・詩を楽しく暗記できるWebアプリ。単語隠し・一文隠し・タイピングテストなど複数モードで効率的に練習できます。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 左ペイン -->
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <h1>
+        <svg width="22" height="22" viewBox="0 0 28 28" fill="none" style="vertical-align:middle;margin-right:7px;margin-bottom:2px;">
+          <rect x="3" y="6"    width="22" height="3" rx="1.5" fill="var(--accent)" opacity="0.35"/>
+          <rect x="3" y="12.5" width="22" height="3" rx="1.5" fill="var(--accent)"/>
+          <rect x="3" y="19"   width="14" height="3" rx="1.5" fill="var(--accent)" opacity="0.35"/>
+          <rect x="18" y="19"  width="7"  height="3" rx="1.5" fill="var(--accent-dim)"/>
+        </svg>暗記アプリ
+      </h1>
+      <button id="btn-new" onclick="showForm()">＋ 新しいテキストを追加</button>
+    </div>
+    <div id="thread-list"></div>
+    <div id="theme-bar">
+      <span class="theme-label">テーマ</span>
+      <div class="theme-swatches">
+        <button class="swatch" data-theme="default" style="background:#7c6af7;" title="パープル" onclick="setTheme('default')"></button>
+        <button class="swatch" data-theme="blue"    style="background:#4f9ef8;" title="ブルー"   onclick="setTheme('blue')"></button>
+        <button class="swatch" data-theme="green"   style="background:#34c98a;" title="グリーン" onclick="setTheme('green')"></button>
+        <button class="swatch" data-theme="light"   style="background:#f0f0f4;border:1px solid #ccc;" title="ライト" onclick="setTheme('light')"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- メインエリア -->
+  <div id="main">
+
+    <!-- 登録フォーム -->
+    <div id="view-form">
+      <div class="form-card">
+        <h2>新しいテキストを登録</h2>
+        <div class="form-group">
+          <label>タイトル</label>
+          <input type="text" id="titleInput" placeholder="例：にじいろ／ハムレット第一幕">
+        </div>
+        <div class="form-group">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <label style="margin:0;">テキスト</label>
+            <button class="btn-add-section" onclick="insertSection()">＋ セクションを追加</button>
+          </div>
+          <textarea id="textInput" placeholder="暗記したい歌詞やセリフを入力してください…"></textarea>
+          <div class="form-hint">💡 <code>[1番]</code> や <code>[サビ]</code> のように書いた行はセクション区切りとして表示されます（暗記対象外）</div>
+        </div>
+        <button class="btn-save" onclick="saveText()">保存する</button>
+      </div>
+    </div>
+
+    <!-- 練習画面 -->
+    <div id="view-practice" style="display:none;">
+      <div id="practice-header">
+        <span id="practice-title-text"></span>
+        <div class="header-actions">
+          <button class="btn-icon" onclick="editCurrent()">編集</button>
+          <button class="btn-delete" onclick="deleteCurrent()">削除</button>
+        </div>
+      </div>
+      <div id="mode-bar">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn-mode active" data-mode="original" onclick="setMode(this)">そのまま</button>
+          <button class="btn-mode" data-mode="word"     onclick="setMode(this)">単語隠し</button>
+          <button class="btn-mode" data-mode="sentence" onclick="setMode(this)">一文隠し</button>
+          <button class="btn-mode" data-mode="first"    onclick="setMode(this)">頭文字のみ</button>
+          <button class="btn-mode" data-mode="typing"   onclick="setMode(this)">✏ テスト</button>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-rewind" id="btn-rewind" onclick="rewindOne(event)" title="ひとつ戻す（Backspace）">↩ 戻る</button>
+          <button class="btn-rewind" id="btn-forward" onclick="forwardOne(event)" title="ひとつ進む（Space / Enter）">進む ↪</button>
+        </div>
+      </div>
+      <div id="typing-bar">
+        <button class="btn-submode active" data-sub="seq" onclick="setTypingSub(this)">順番入力</button>
+        <button class="btn-submode" data-sub="free" onclick="setTypingSub(this)">自由入力</button>
+        <button class="btn-charcount-toggle active" id="btn-charcount" onclick="toggleCharCount(this)" title="入力文字数の表示切り替え">文字数 表示</button>
+        <span id="typing-score"></span>
+      </div>
+      <div id="practice-content">
+        <nav id="toc-panel"></nav>
+        <div id="practice-body" onclick="revealNext(event)" onmousedown="handleBodyMousedown(event)">
+          <div id="practice-hint"></div>
+          <div id="text-display"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
