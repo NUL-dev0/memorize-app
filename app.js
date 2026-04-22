@@ -269,9 +269,7 @@ function setMode(btn) {
   document.getElementById('btn-rewind').style.display   = isTyping ? 'none' : '';
   document.getElementById('btn-forward').style.display  = isTyping ? 'none' : '';
   document.body.classList.toggle('typing-mode', isTyping);
-  document.body.classList.toggle('typing-seq', isTyping && typingSub === 'seq');
   document.body.classList.toggle('reveal-mode', ['word','sentence','first'].includes(currentMode));
-  updateMobileBar();
   renderText();
 }
 
@@ -578,8 +576,6 @@ function setTypingSub(btn) {
   typingSub = btn.dataset.sub;
   document.querySelectorAll('.btn-submode').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.body.classList.toggle('typing-seq', typingSub === 'seq');
-  updateMobileBar();
   renderText();
 }
 
@@ -592,27 +588,13 @@ function toggleCharCount(btn) {
   btn.textContent = showCharCount ? '文字数 表示' : '文字数 非表示';
 }
 
-/* ---- モバイル下部バー：ラベル更新・アクション振り分け ---- */
-function updateMobileBar() {
-  const fwd = document.getElementById('mb-btn-forward');
-  if (!fwd) return;
-  fwd.textContent = (currentMode === 'typing' && typingSub === 'seq') ? '次へ →' : '進む →';
-}
-
+/* ---- モバイル下部バー（隠しモード用） ---- */
 function mobileBack(e) {
-  if (currentMode === 'typing' && typingSub === 'seq') {
-    if (currentTypingIdx > 0) backLine(currentTypingIdx);
-  } else {
-    rewindOne(e);
-  }
+  rewindOne(e);
 }
 
 function mobileForward(e) {
-  if (currentMode === 'typing' && typingSub === 'seq') {
-    submitLine(currentTypingIdx);
-  } else {
-    revealNext({ target: document.getElementById('practice-body') });
-  }
+  revealNext({ target: document.getElementById('practice-body') });
 }
 
 /* 文字数ラベル更新（現在入力数/目標文字数） */
@@ -642,16 +624,18 @@ function renderTyping(text) {
     return `<div class="text-line typing-line" id="tline-${idx}" ${hidden ? 'style="display:none"' : ''}>
       <div class="typing-content">
         <div class="typing-original">${esc(rawLine)}</div>
-        <div style="display:flex;gap:8px;align-items:center;">
+        <div class="typing-input-row">
           <input class="typing-input" id="tinput-${idx}" type="text"
             placeholder="ここに入力…" autocomplete="off" spellcheck="false"
             data-original="${esc(rawLine)}" data-idx="${idx}" data-total="${total}">
           <span class="char-count" id="ccount-${idx}">0/${total}文字</span>
-          ${typingSub === 'seq' ? `
-            <button class="btn-next-line" id="tbtn-${idx}" onclick="submitLine(${idx})">次へ →</button>
-            ${idx > 0 ? `<button class="btn-back-line" onclick="backLine(${idx})">← 戻る</button>` : ''}
-          ` : ''}
         </div>
+        ${typingSub === 'seq' ? `
+          <div class="typing-btns">
+            ${idx > 0 ? `<button class="btn-back-line" onclick="backLine(${idx})">← 戻る</button>` : '<span class="typing-btn-spacer"></span>'}
+            <button class="btn-next-line" id="tbtn-${idx}" onclick="submitLine(${idx})">次へ →</button>
+          </div>
+        ` : ''}
         <div class="typing-feedback" id="tfb-${idx}"></div>
       </div>
     </div>`;
