@@ -85,11 +85,11 @@
         </div>
       </div>
       <div id="mode-bar">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <div style="display:flex;gap:6px;overflow-x:auto;">
           <button class="btn-mode active" data-mode="original" onclick="setMode(this)">そのまま</button>
+          <button class="btn-mode" data-mode="first"    onclick="setMode(this)">頭文字のみ</button>
           <button class="btn-mode" data-mode="word"     onclick="setMode(this)">単語隠し</button>
           <button class="btn-mode" data-mode="sentence" onclick="setMode(this)">一文隠し</button>
-          <button class="btn-mode" data-mode="first"    onclick="setMode(this)">頭文字のみ</button>
           <button class="btn-mode" data-mode="typing"   onclick="setMode(this)">✏ テスト</button>
         </div>
         <div style="display:flex;gap:6px;">

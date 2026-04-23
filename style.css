@@ -383,9 +383,10 @@ body.typing-mode .btn-section-jump { display: none; }
   display: flex;
   gap: 6px;
   justify-content: space-between;
-  flex-wrap: wrap;
   flex-shrink: 0;
+  overflow-x: auto;
 }
+#mode-bar::-webkit-scrollbar { display: none; }
 
 .btn-mode {
   padding: 6px 14px;

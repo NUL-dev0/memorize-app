@@ -195,17 +195,15 @@ function closeSidebar() {
   document.addEventListener('touchstart', e => {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
-    const sidebar = document.getElementById('sidebar');
-    maySwipe = startX < 36 || sidebar.classList.contains('sidebar-open');
+    maySwipe = startX < 36; // 左端からのスワイプのみ追跡（開く方向）
   }, { passive: true });
   document.addEventListener('touchend', e => {
     if (!maySwipe) return;
     const dx = e.changedTouches[0].clientX - startX;
     const dy = Math.abs(e.changedTouches[0].clientY - startY);
-    if (dy > 80) return; // 縦スクロールは無視
+    if (dy > 80) return;
     const sidebar = document.getElementById('sidebar');
     if (!sidebar.classList.contains('sidebar-open') && dx > 56 && startX < 36) toggleSidebar();
-    else if (sidebar.classList.contains('sidebar-open') && dx < -56) toggleSidebar();
     maySwipe = false;
   }, { passive: true });
 })();
