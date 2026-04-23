@@ -402,6 +402,17 @@ body.typing-mode .btn-section-jump { display: none; }
 .btn-mode:hover { border-color: var(--accent); color: var(--text); }
 .btn-mode.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 
+/* テストボタンは非アクティブ時も目立つようにアクセント色で表示 */
+.btn-mode[data-mode="typing"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.btn-mode[data-mode="typing"].active {
+  background: var(--accent);
+  color: #fff;
+}
+
 .btn-rewind {
   padding: 6px 14px;
   border: 1px solid var(--border);

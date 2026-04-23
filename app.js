@@ -191,11 +191,12 @@ function closeSidebar() {
 
 /* ---- モバイル：スワイプジェスチャー ---- */
 ;(function() {
+  /* ---- サイドバー：左端スワイプで開く ---- */
   let startX = 0, startY = 0, maySwipe = false;
   document.addEventListener('touchstart', e => {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
-    maySwipe = startX < 36; // 左端からのスワイプのみ追跡（開く方向）
+    maySwipe = startX < 36; // 左端から開始した場合のみ追跡
   }, { passive: true });
   document.addEventListener('touchend', e => {
     if (!maySwipe) return;
@@ -203,8 +204,21 @@ function closeSidebar() {
     const dy = Math.abs(e.changedTouches[0].clientY - startY);
     if (dy > 80) return;
     const sidebar = document.getElementById('sidebar');
-    if (!sidebar.classList.contains('sidebar-open') && dx > 56 && startX < 36) toggleSidebar();
+    if (!sidebar.classList.contains('sidebar-open') && dx > 56) toggleSidebar();
     maySwipe = false;
+  }, { passive: true });
+
+  /* ---- オーバーレイ：タップのみ閉じる（スワイプは閉じない） ---- */
+  const overlay = document.getElementById('sidebar-overlay');
+  let ovX = 0, ovY = 0;
+  overlay.addEventListener('touchstart', e => {
+    ovX = e.touches[0].clientX;
+    ovY = e.touches[0].clientY;
+  }, { passive: true });
+  overlay.addEventListener('touchend', e => {
+    const dx = Math.abs(e.changedTouches[0].clientX - ovX);
+    const dy = Math.abs(e.changedTouches[0].clientY - ovY);
+    if (dx < 12 && dy < 12) toggleSidebar(); // 小さい動き＝タップとみなして閉じる
   }, { passive: true });
 })();
 
@@ -402,7 +416,7 @@ function segmentLine(line) {
   if (_segmenter) {
     return [..._segmenter.segment(line)].map(seg => ({
       value:  seg.segment,
-      isWord: seg.isWordLike,
+      isWord: seg.isWordLike || /^\d+$/.test(seg.segment),
     }));
   }
   return (line.match(/[a-zA-Z0-9]+|[\u3000-\u9fff\uff00-\uffef\u30a0-\u30ff\u3040-\u309f]+|[\s　]+|./g) || [])
@@ -489,7 +503,7 @@ function scrollLineToCenter(lineEl) {
   const bodyRect = body.getBoundingClientRect();
   const lineRect = lineEl.getBoundingClientRect();
   // モバイルは上1/4に配置（キーボードと被らないよう）、デスクトップは中央
-  const ratio   = window.innerWidth <= 768 ? 0.22 : 0.5;
+  const ratio   = window.innerWidth <= 768 ? 0.12 : 0.5;
   const targetY = body.scrollTop + (lineRect.top - bodyRect.top) - body.clientHeight * ratio;
   body.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
 }
@@ -654,12 +668,17 @@ function renderTyping(text) {
     let bsTimer   = null;
     const total   = +input.dataset.total;
 
-    /* フォーカス時に入力欄を画面中央に寄せる＋目次を更新 */
+    /* フォーカス時に入力欄を上寄りに配置＋目次更新。
+       iOS がキーボード展開時にページスクロールするのを 150ms 後にリセット。 */
     input.addEventListener('focus', () => {
-      requestAnimationFrame(() => {
-        scrollLineToCenter(document.getElementById(`tline-${input.dataset.idx}`));
-        updateTocActive();
-      });
+      scrollLineToCenter(document.getElementById(`tline-${input.dataset.idx}`));
+      updateTocActive();
+      if (window.innerWidth <= 768) {
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          scrollLineToCenter(document.getElementById(`tline-${input.dataset.idx}`));
+        }, 150);
+      }
     });
 
     /* リアルタイム文字数更新（スペース除外） */
