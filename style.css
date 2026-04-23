@@ -944,6 +944,9 @@ body.hide-charcount .char-count { display: none; }
     gap: 8px;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    /* 右端グラデーションでスクロール可能なことを示唆 */
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
   }
   #mode-bar::-webkit-scrollbar { display: none; }
   #mode-bar > div:last-child { display: none !important; } /* 戻る/進むグループ非表示（inline styleを上書き） */

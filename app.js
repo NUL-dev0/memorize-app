@@ -57,43 +57,48 @@ function initSwipeDelete() {
   document.querySelectorAll('.thread-row').forEach(row => {
     const item = row.querySelector('.thread-item');
     if (!item) return;
-    let startX = 0, startY = 0, tracking = false;
+    let startX = 0, startY = 0, tracking = false, moved = false;
 
     item.addEventListener('touchstart', e => {
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
       tracking = true;
+      moved = false;
+      item.style.transition = 'none'; // ドラッグ中はアニメ無効
     }, { passive: true });
 
     item.addEventListener('touchmove', e => {
       if (!tracking) return;
       const dx = e.touches[0].clientX - startX;
       const dy = Math.abs(e.touches[0].clientY - startY);
-      if (dy > 10) { tracking = false; return; }
-      if (dx < -8) {
-        const clamped = Math.max(-72, dx);
-        item.style.transform = `translateX(${clamped}px)`;
-        item.style.transition = 'none';
-      }
+      // 縦スクロールと判断したら追跡終了
+      if (!moved && dy > Math.abs(dx) && dy > 6) { tracking = false; snapRow(row); return; }
+      if (Math.abs(dx) > 4) moved = true;
+      // 現在の状態（開/閉）を基点にして移動量を加算し -72〜0 にクランプ
+      const base = row.classList.contains('swiped') ? -72 : 0;
+      item.style.transform = `translateX(${Math.max(-72, Math.min(0, base + dx))}px)`;
     }, { passive: true });
 
     item.addEventListener('touchend', e => {
       if (!tracking) return;
       tracking = false;
+      if (!moved) { snapRow(row); return; } // 動いていない＝タップ → 現状維持（onclickに任せる）
       const dx = e.changedTouches[0].clientX - startX;
-      if (dx < -40) {
-        openSwipedRow(row);
+      if (row.classList.contains('swiped')) {
+        // 開いている状態から右に20px以上スワイプ → 閉じる
+        if (dx >= 20) resetSwipedRow(row); else openSwipedRow(row);
       } else {
-        resetSwipedRow(row);
+        // 閉じている状態から左に30px以上スワイプ → 開く
+        if (dx <= -30) openSwipedRow(row); else resetSwipedRow(row);
       }
     }, { passive: true });
   });
 
-  /* 他の行をタップしたら開いている行を閉じる */
-  document.getElementById('thread-list').addEventListener('touchstart', e => {
-    const row = e.target.closest('.thread-row');
+  /* サイドバー内の任意の場所をタッチしたら、他の開いている行を閉じる */
+  document.getElementById('sidebar').addEventListener('touchstart', e => {
+    const touchedRow = e.target.closest('.thread-row');
     document.querySelectorAll('.thread-row.swiped').forEach(r => {
-      if (r !== row) resetSwipedRow(r);
+      if (r !== touchedRow) resetSwipedRow(r);
     });
   }, { passive: true });
 }
@@ -110,6 +115,11 @@ function resetSwipedRow(row) {
   row.classList.remove('swiped');
   item.style.transition = 'transform 0.2s ease';
   item.style.transform = '';
+}
+
+function snapRow(row) {
+  if (row.classList.contains('swiped')) openSwipedRow(row);
+  else resetSwipedRow(row);
 }
 
 /* ---- 初回スワイプ削除ヒント ---- */
@@ -1086,6 +1096,20 @@ function insertDefaultSample() {
   setAll(saved);
 }
 
+/* ---- モードバーのテストボタンをわずかにチラ見えさせる（モバイルのみ） ---- */
+function initModeBarPeek() {
+  if (window.innerWidth > 768) return;
+  const bar = document.getElementById('mode-bar');
+  const testBtn = bar?.querySelector('[data-mode="typing"]');
+  if (!bar || !testBtn) return;
+  requestAnimationFrame(() => {
+    const barRect  = bar.getBoundingClientRect();
+    const btnRect  = testBtn.getBoundingClientRect();
+    const overflow = btnRect.right - barRect.right; // テスト右端がバーからはみ出す量
+    if (overflow > 0) bar.scrollLeft = Math.max(0, overflow - 20); // 20px チラ見えになる位置
+  });
+}
+
 /* ---- 初期化 ---- */
 const savedTheme = localStorage.getItem('memorize_theme') || 'default';
 setTheme(savedTheme);
@@ -1093,3 +1117,4 @@ const isFirstLaunch = Object.keys(getAll()).length === 0;
 insertDefaultSample();
 renderSidebar();
 if (isFirstLaunch) selectText('1000000000000');
+initModeBarPeek();
