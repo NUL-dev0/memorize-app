@@ -292,7 +292,10 @@ function toggleModeBar() {
 function applyModeBarVisibility() {
   document.getElementById('mode-bar').style.display = modeBarVisible ? '' : 'none';
   const btn = document.getElementById('btn-modebar-toggle');
-  if (btn) btn.classList.toggle('bar-hidden', !modeBarVisible);
+  if (!btn) return;
+  btn.classList.toggle('bar-hidden', !modeBarVisible);
+  btn.textContent = modeBarVisible ? '▴ モード' : '▾ モード';
+  btn.title = modeBarVisible ? 'モードバーを隠す' : 'モードバーを表示';
 }
 
 /* ---- モード切り替え ---- */
@@ -530,7 +533,7 @@ function scrollLineToCenter(lineEl) {
   const bodyRect = body.getBoundingClientRect();
   const lineRect = lineEl.getBoundingClientRect();
   // モバイルは上1/4に配置（キーボードと被らないよう）、デスクトップは中央
-  const ratio   = window.innerWidth <= 768 ? 0.12 : 0.5;
+  const ratio   = window.innerWidth <= 768 ? 0.06 : 0.5;
   const targetY = body.scrollTop + (lineRect.top - bodyRect.top) - body.clientHeight * ratio;
   body.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
 }
@@ -695,17 +698,12 @@ function renderTyping(text) {
     let bsTimer   = null;
     const total   = +input.dataset.total;
 
-    /* フォーカス時に入力欄を上寄りに配置＋目次更新。
-       iOS がキーボード展開時にページスクロールするのを 150ms 後にリセット。 */
+    /* フォーカス時に入力欄を画面上寄りに配置 */
     input.addEventListener('focus', () => {
-      scrollLineToCenter(document.getElementById(`tline-${input.dataset.idx}`));
-      updateTocActive();
-      if (window.innerWidth <= 768) {
-        setTimeout(() => {
-          window.scrollTo(0, 0);
-          scrollLineToCenter(document.getElementById(`tline-${input.dataset.idx}`));
-        }, 150);
-      }
+      requestAnimationFrame(() => {
+        scrollLineToCenter(document.getElementById(`tline-${input.dataset.idx}`));
+        updateTocActive();
+      });
     });
 
     /* リアルタイム文字数更新（スペース除外） */

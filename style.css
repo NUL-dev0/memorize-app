@@ -53,6 +53,8 @@
   --hidden-bg: #ddd;
 }
 
+html { overflow: hidden; height: 100%; } /* iOS がキーボード展開時にドキュメントをスクロールするのを防ぐ */
+
 body {
   font-family: -apple-system, 'Hiragino Sans', 'Meiryo', sans-serif;
   background: var(--bg);
@@ -1049,18 +1051,20 @@ body.hide-charcount .char-count { display: none; }
   }
 
   /* ===== iPhone ノッチ・Dynamic Island 対応 ===== */
-  #practice-header {
-    padding-top: max(10px, env(safe-area-inset-top, 10px));
+  /* #main に safe-area-inset-top をまとめて適用することで、
+     キーボード展開時の env() 再計算による崩れを防ぐ */
+  #main {
+    padding-top: env(safe-area-inset-top, 0px);
   }
+  /* サイドバーは position:fixed なので個別に設定 */
   #sidebar-header {
     padding-top: max(20px, calc(env(safe-area-inset-top, 0px) + 12px));
   }
-  #view-form {
-    padding-top: max(16px, env(safe-area-inset-top, 16px));
-  }
 
-  /* ===== フローティングバー表示時はパディングを確保 ===== */
+  /* ===== フローティングバー表示時・テストモード時はパディングを確保 ===== */
   body.reveal-mode #practice-body { padding-bottom: 100px; }
+  /* テストモード：画面下のSafari UIバーとボタンが重ならないよう余白を確保 */
+  body.typing-mode #practice-body { padding-bottom: 280px; }
 
   /* ===== モードバーの戻る/進むグループを非表示（フローティングバーが代替） ===== */
   #mode-bar > div:last-child { display: none !important; }
