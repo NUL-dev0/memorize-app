@@ -363,6 +363,8 @@ body.typing-mode .btn-section-jump { display: none; }
 }
 
 .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+/* モードバー非表示時はトグルボタンをアクセント色でハイライト */
+#btn-modebar-toggle.bar-hidden { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 
 .btn-delete {
   padding: 6px 12px;
@@ -591,9 +593,19 @@ body.typing-mode .btn-section-jump { display: none; }
 
 .text-line {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   gap: 12px;
   min-height: 1.8em;
+}
+
+/* 行番号の右側：テキスト・トークンのコンテナ。行番号の下に回り込まない */
+.line-inner {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
 }
 
 .text-line::before {
@@ -974,12 +986,9 @@ body.hide-charcount .char-count { display: none; }
 
   /* ===== テキスト表示 ===== */
   #text-display { font-size: 1rem; line-height: 1.9; }
-  .text-line {
-    align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
-  }
-  .text-line::before { min-width: 1.2em; font-size: 0.65rem; }
+  .text-line { align-items: flex-start; gap: 8px; }
+  .text-line::before { min-width: 1.2em; font-size: 0.65rem; padding-top: 0.3em; }
+  .line-inner { gap: 6px; }
   .token.hidden { line-height: 1.4; min-width: 1em; }
   .word-group { display: inline-flex; align-items: center; }
 

@@ -281,6 +281,20 @@ function deleteCurrent() {
   showForm();
 }
 
+/* ---- モードバー 表示/非表示トグル ---- */
+let modeBarVisible = true;
+
+function toggleModeBar() {
+  modeBarVisible = !modeBarVisible;
+  applyModeBarVisibility();
+}
+
+function applyModeBarVisibility() {
+  document.getElementById('mode-bar').style.display = modeBarVisible ? '' : 'none';
+  const btn = document.getElementById('btn-modebar-toggle');
+  if (btn) btn.classList.toggle('bar-hidden', !modeBarVisible);
+}
+
 /* ---- モード切り替え ---- */
 function setMode(btn) {
   currentMode = btn.dataset.mode;
@@ -292,6 +306,9 @@ function setMode(btn) {
   document.getElementById('btn-forward').style.display  = isTyping ? 'none' : '';
   document.body.classList.toggle('typing-mode', isTyping);
   document.body.classList.toggle('reveal-mode', ['word','sentence','first'].includes(currentMode));
+  // テストモード時はモードバーを自動で隠し、他のモードでは自動で表示する
+  modeBarVisible = !isTyping;
+  applyModeBarVisibility();
   renderText();
 }
 
@@ -318,7 +335,7 @@ function renderText() {
     el.innerHTML = text.split('\n').map(line =>
       isSection(line)
         ? renderSectionLabel(line)
-        : `<div class="text-line">${esc(line) || '&nbsp;'}</div>`
+        : `<div class="text-line"><span class="line-inner">${esc(line) || '&nbsp;'}</span></div>`
     ).join('');
     addLineAnchors(); buildToc();
     return;
@@ -349,7 +366,7 @@ function renderText() {
       }
       return `<span class="token hidden" data-idx="${t.idx}">${esc(t.value)}</span>`;
     }).join('');
-    return `<div class="text-line">${inner || '&nbsp;'}</div>`;
+    return `<div class="text-line"><span class="line-inner">${inner || '&nbsp;'}</span></div>`;
   }).join('');
 
   markNextReveal();
