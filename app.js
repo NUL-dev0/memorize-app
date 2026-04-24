@@ -365,6 +365,12 @@ function renderText() {
     const inner = line.map(t => {
       if (t.type === 'space') return esc(t.value);
       if (t.type === 'hint') return `<span class="token hint">${esc(t.value)}</span>`;
+      if (t.type === 'line-hint') {
+        const hiddenPart = t.rest
+          ? `<span class="token line-rest hidden" data-idx="${t.idx}">${esc(t.rest)}</span>`
+          : '';
+        return `<span class="token hint line-hint-char">${esc(t.hint)}</span>${hiddenPart}`;
+      }
       if (t.type === 'word-hint') {
         const hiddenPart = t.rest
           ? `<span class="token hidden" data-idx="${t.idx}">${esc(t.rest)}</span>`
@@ -433,13 +439,7 @@ function buildTokens(text, mode) {
       if (li > 0) tokens.push({ type: 'br' });
       if (isSection(line)) { tokens.push({ type: 'section', value: sectionName(line) }); return; }
       if (!line.trim()) return;
-      segmentLine(line).forEach(seg => {
-        if (!seg.isWord) {
-          tokens.push({ type: 'space', value: seg.value });
-        } else {
-          tokens.push({ type: 'word-hint', hint: seg.value[0], rest: seg.value.slice(1) });
-        }
-      });
+      tokens.push({ type: 'line-hint', hint: line[0], rest: line.slice(1) });
     });
     return tokens;
   }

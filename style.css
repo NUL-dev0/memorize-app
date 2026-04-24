@@ -642,6 +642,22 @@ body.typing-mode .btn-section-jump { display: none; }
   vertical-align: baseline;
 }
 
+/* 頭文字モード用：行全体の残りを担う要素 */
+.token.line-rest {
+  flex: 1;
+  min-width: 0;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  white-space: normal;
+  display: inline-block;
+}
+
+/* 頭文字モードの頭文字：常に左上に固定 */
+.line-hint-char {
+  align-self: flex-start;
+  flex-shrink: 0;
+}
+
 .token.hidden.next-reveal {
   background: var(--accent-dim);
   outline: 1px solid var(--accent);
