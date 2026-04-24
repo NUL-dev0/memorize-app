@@ -969,7 +969,7 @@ body.hide-charcount .char-count { display: none; }
     padding: 10px 12px;
     gap: 8px;
   }
-  #practice-title-text { font-size: 0.88rem; }
+  #practice-title-text { font-size: 0.88rem; cursor: pointer; }
   .btn-delete { display: none; }        /* 削除ボタン非表示（誤タップ防止） */
   .btn-icon { padding: 5px 10px; min-height: unset; }
 
