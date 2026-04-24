@@ -299,7 +299,7 @@ function applyModeBarVisibility() {
   if (!btn) return;
   btn.classList.toggle('bar-hidden', !modeBarVisible);
   btn.textContent = modeBarVisible ? '▴' : '▾';
-  btn.title = modeBarVisible ? 'モードバーを隠す' : 'モードバーを表示';
+  btn.title = '';
 }
 
 /* ---- モード切り替え ---- */
