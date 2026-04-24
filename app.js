@@ -6,7 +6,11 @@ function getAll() {
   return JSON.parse(localStorage.getItem('memorize_texts') || '{}');
 }
 function setAll(data) {
-  localStorage.setItem('memorize_texts', JSON.stringify(data));
+  try {
+    localStorage.setItem('memorize_texts', JSON.stringify(data));
+  } catch (e) {
+    alert('保存に失敗しました。ストレージの空き容量が不足している可能性があります。');
+  }
 }
 
 /* ---- サイドバー描画 ---- */
@@ -294,7 +298,7 @@ function applyModeBarVisibility() {
   const btn = document.getElementById('btn-modebar-toggle');
   if (!btn) return;
   btn.classList.toggle('bar-hidden', !modeBarVisible);
-  btn.textContent = modeBarVisible ? '▴ モード' : '▾ モード';
+  btn.textContent = modeBarVisible ? '▴' : '▾';
   btn.title = modeBarVisible ? 'モードバーを隠す' : 'モードバーを表示';
 }
 
@@ -387,7 +391,7 @@ function sectionName(line) {
 
 function renderSectionLabel(line) {
   const name = sectionName(line);
-  return `<div class="section-label" id="toc-anchor-${name}">
+  return `<div class="section-label" id="toc-anchor-${esc(name)}">
     <span class="section-badge">${esc(name)}</span>
     <span class="section-line"></span>
     <button class="btn-section-jump" onclick="jumpToSection(event, this)" data-section="${esc(name)}">ここから</button>
@@ -429,7 +433,13 @@ function buildTokens(text, mode) {
       if (li > 0) tokens.push({ type: 'br' });
       if (isSection(line)) { tokens.push({ type: 'section', value: sectionName(line) }); return; }
       if (!line.trim()) return;
-      tokens.push({ type: 'word-hint', hint: line[0], rest: line.slice(1) });
+      segmentLine(line).forEach(seg => {
+        if (!seg.isWord) {
+          tokens.push({ type: 'space', value: seg.value });
+        } else {
+          tokens.push({ type: 'word-hint', hint: seg.value[0], rest: seg.value.slice(1) });
+        }
+      });
     });
     return tokens;
   }
@@ -652,6 +662,15 @@ function renderTyping(text) {
   const hint = document.getElementById('practice-hint');
   typingDone = {};
   currentTypingIdx = 0;
+
+  /* showCharCount の状態をボタンと body クラスに同期（再入時のズレを防ぐ） */
+  document.body.classList.toggle('hide-charcount', !showCharCount);
+  const ccBtn = document.getElementById('btn-charcount');
+  if (ccBtn) {
+    ccBtn.classList.toggle('active', showCharCount);
+    ccBtn.textContent = showCharCount ? '文字数 表示' : '文字数 非表示';
+  }
+
   hint.innerHTML = typingSub === 'seq'
     ? '💡 入力して <kbd>次へ →</kbd> または <kbd>Enter 長押し</kbd> で確定 ／ 空欄で <kbd>BS 長押し</kbd> または <kbd>← 戻る</kbd> で前の行に戻れます'
     : '💡 全ての行を入力したら下の <kbd>答え合わせをする</kbd> を押してください';
@@ -934,7 +953,7 @@ function buildToc() {
     lines.forEach(line => {
       if (!isSection(line)) return;
       const name = sectionName(line);
-      items.push({ label: name, anchor: `toc-anchor-${name}`, cls: 'toc-section', useId: true });
+      items.push({ label: name, anchor: `toc-anchor-${name}`, cls: 'toc-section' });
     });
   } else {
     const total = document.querySelectorAll('#text-display .text-line').length;
@@ -1069,7 +1088,7 @@ function updateTocActive() {
 }
 
 function esc(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 /* ---- テーマ ---- */

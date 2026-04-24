@@ -366,6 +366,7 @@ body.typing-mode .btn-section-jump { display: none; }
 
 .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
 /* モードバー非表示時はトグルボタンをアクセント色でハイライト */
+#btn-modebar-toggle { font-size: 1.2rem; padding: 4px 10px; line-height: 1; }
 #btn-modebar-toggle.bar-hidden { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 
 .btn-delete {
@@ -963,7 +964,6 @@ body.hide-charcount .char-count { display: none; }
     mask-image: linear-gradient(to right, black 80%, transparent 100%);
   }
   #mode-bar::-webkit-scrollbar { display: none; }
-  #mode-bar > div:last-child { display: none !important; } /* 戻る/進むグループ非表示（inline styleを上書き） */
   .btn-mode {
     white-space: nowrap;
     flex-shrink: 0;
@@ -995,8 +995,6 @@ body.hide-charcount .char-count { display: none; }
   .word-group { display: inline-flex; align-items: center; }
 
   /* ===== practice-body ===== */
-  /* reveal-mode 時はフローティングバー分のパディングを確保 */
-  body.reveal-mode #practice-body { padding-bottom: 90px; }
   #practice-body { padding: 16px 16px 20px; }
 
   /* ===== フォーム画面 ===== */
