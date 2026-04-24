@@ -671,8 +671,11 @@ function renderTyping(text) {
     ccBtn.textContent = showCharCount ? '文字数 表示' : '文字数 非表示';
   }
 
+  const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   hint.innerHTML = typingSub === 'seq'
-    ? '💡 入力して <kbd>次へ →</kbd> または <kbd>Enter 長押し</kbd> で確定 ／ 空欄で <kbd>BS 長押し</kbd> または <kbd>← 戻る</kbd> で前の行に戻れます'
+    ? isMobile
+      ? '💡 入力して <kbd>次へ →</kbd> または <kbd>Enter</kbd> で確定 ／ <kbd>← 戻る</kbd> で前の行に戻れます'
+      : '💡 入力して <kbd>次へ →</kbd> または <kbd>Enter 長押し</kbd> で確定 ／ 空欄で <kbd>BS 長押し</kbd> または <kbd>← 戻る</kbd> で前の行に戻れます'
     : '💡 全ての行を入力したら下の <kbd>答え合わせをする</kbd> を押してください';
 
   let lineIdx = 0;
@@ -730,11 +733,16 @@ function renderTyping(text) {
       updateCharCount(+input.dataset.idx, input.value.replace(/[\s　]/g, '').length, total);
     });
 
-    /* Enter長押し（600ms）で確定 */
+    /* Enter確定：スマホはワンタップ、PCは長押し（600ms） */
+    const isMobileInput = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !e.repeat) {
         e.preventDefault();
         if (typingSub !== 'seq') return;
+        if (isMobileInput) {
+          submitLine(+input.dataset.idx);
+          return;
+        }
         const btn = document.getElementById(`tbtn-${input.dataset.idx}`);
         if (btn) btn.classList.add('holding');
         holdTimer = setTimeout(() => {
@@ -807,6 +815,7 @@ function submitLine(idx) {
   const nextInput = document.getElementById(`tinput-${idx + 1}`);
   if (nextLine) {
     nextLine.style.display = '';
+    nextLine.offsetHeight; // force reflow でDOMを確定させてからフォーカス
     nextInput?.focus({ preventScroll: true });
     requestAnimationFrame(() => { scrollLineToCenter(nextLine); updateTocActive(); });
   } else {
