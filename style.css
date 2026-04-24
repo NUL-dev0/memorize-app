@@ -971,7 +971,7 @@ body.hide-charcount .char-count { display: none; }
   }
   #practice-title-text { font-size: 0.88rem; }
   .btn-delete { display: none; }        /* 削除ボタン非表示（誤タップ防止） */
-  .btn-icon { padding: 8px 14px; min-height: 40px; }
+  .btn-icon { padding: 5px 10px; min-height: unset; }
 
   /* ===== ヒント文非表示 ===== */
   #practice-hint { display: none; }
@@ -993,14 +993,14 @@ body.hide-charcount .char-count { display: none; }
   .btn-mode {
     white-space: nowrap;
     flex-shrink: 0;
-    padding: 8px 16px;
-    min-height: 40px;
-    font-size: 0.85rem;
+    padding: 5px 12px;
+    min-height: unset;
+    font-size: 0.82rem;
   }
 
   /* ===== タイピングバー ===== */
-  #typing-bar { padding: 8px 12px; gap: 8px; }
-  .btn-submode { padding: 8px 16px; min-height: 40px; font-size: 0.85rem; }
+  #typing-bar { padding: 4px 12px; gap: 6px; }
+  .btn-submode { padding: 5px 12px; min-height: unset; font-size: 0.82rem; }
   .btn-charcount-toggle { display: none; } /* 文字数トグル非表示 */
   #typing-score { margin-left: 0; }
 

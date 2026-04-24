@@ -181,6 +181,11 @@ function selectText(id) {
   currentId   = id;
   currentMode = 'original';
   document.querySelectorAll('.btn-mode').forEach(b => b.classList.toggle('active', b.dataset.mode === 'original'));
+  document.getElementById('typing-bar').style.display      = 'none';
+  document.getElementById('typing-submodes').style.display = 'none';
+  document.getElementById('btn-rewind').style.display      = '';
+  document.getElementById('btn-forward').style.display     = '';
+  document.body.classList.remove('typing-mode', 'reveal-mode');
   document.getElementById('view-form').style.display     = 'none';
   document.getElementById('view-practice').style.display = 'flex';
 
@@ -314,6 +319,8 @@ function setMode(btn) {
   document.getElementById('btn-forward').style.display     = isTyping ? 'none' : '';
   document.body.classList.toggle('typing-mode', isTyping);
   document.body.classList.toggle('reveal-mode', ['word','sentence','first'].includes(currentMode));
+  modeBarVisible = true;
+  applyModeBarVisibility();
   renderText();
 }
 
