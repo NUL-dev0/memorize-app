@@ -308,14 +308,12 @@ function setMode(btn) {
   document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const isTyping = currentMode === 'typing';
-  document.getElementById('typing-bar').style.display   = isTyping ? 'flex' : 'none';
-  document.getElementById('btn-rewind').style.display   = isTyping ? 'none' : '';
-  document.getElementById('btn-forward').style.display  = isTyping ? 'none' : '';
+  document.getElementById('typing-bar').style.display      = isTyping ? 'flex' : 'none';
+  document.getElementById('typing-submodes').style.display = isTyping ? 'flex' : 'none';
+  document.getElementById('btn-rewind').style.display      = isTyping ? 'none' : '';
+  document.getElementById('btn-forward').style.display     = isTyping ? 'none' : '';
   document.body.classList.toggle('typing-mode', isTyping);
   document.body.classList.toggle('reveal-mode', ['word','sentence','first'].includes(currentMode));
-  // テストモード時はモードバーを自動で隠し、他のモードでは自動で表示する
-  modeBarVisible = !isTyping;
-  applyModeBarVisibility();
   renderText();
 }
 

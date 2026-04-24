@@ -92,6 +92,10 @@
           <button class="btn-mode" data-mode="word"     onclick="setMode(this)">単語</button>
           <button class="btn-mode" data-mode="sentence" onclick="setMode(this)">一文</button>
           <button class="btn-mode" data-mode="typing"   onclick="setMode(this)">テスト</button>
+          <div id="typing-submodes">
+            <button class="btn-submode active" data-sub="seq" onclick="setTypingSub(this)">順番入力</button>
+            <button class="btn-submode" data-sub="free" onclick="setTypingSub(this)">自由入力</button>
+          </div>
         </div>
         <div style="display:flex;gap:6px;">
           <button class="btn-rewind" id="btn-rewind" onclick="rewindOne(event)" title="ひとつ戻す（Backspace）">← 戻る</button>
@@ -99,8 +103,6 @@
         </div>
       </div>
       <div id="typing-bar">
-        <button class="btn-submode active" data-sub="seq" onclick="setTypingSub(this)">順番入力</button>
-        <button class="btn-submode" data-sub="free" onclick="setTypingSub(this)">自由入力</button>
         <button class="btn-charcount-toggle active" id="btn-charcount" onclick="toggleCharCount(this)" title="入力文字数の表示切り替え">文字数 表示</button>
         <span id="typing-score"></span>
       </div>

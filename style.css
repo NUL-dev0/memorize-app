@@ -709,6 +709,16 @@ body.typing-mode .btn-section-jump { display: none; }
 .swatch.active { border-color: var(--text); transform: scale(1.15); }
 
 /* ===== テストモード ===== */
+#typing-submodes {
+  display: none;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: 4px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+}
+
 #typing-bar {
   padding: 8px 24px;
   border-bottom: 1px solid var(--border);
