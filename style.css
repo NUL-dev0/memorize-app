@@ -1112,7 +1112,7 @@ body.hide-charcount .char-count { display: none; }
   .word-group { display: inline-flex; align-items: center; }
 
   /* ===== practice-body ===== */
-  #practice-body { padding: 16px 16px 20px; }
+  #practice-body { padding: 16px 16px calc(40px + env(safe-area-inset-bottom, 0px)); }
 
   /* ===== フォーム画面 ===== */
   #view-form { padding-top: 16px; }
@@ -1177,7 +1177,7 @@ body.hide-charcount .char-count { display: none; }
   }
 
   /* ===== フローティングバー表示時・テストモード時はパディングを確保 ===== */
-  body.reveal-mode #practice-body { padding-bottom: 100px; }
+  body.reveal-mode #practice-body { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
   /* テストモード：画面下のSafari UIバーとボタンが重ならないよう余白を確保 */
   body.typing-mode #practice-body { padding-bottom: 280px; }
 
