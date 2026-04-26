@@ -73,6 +73,14 @@
         Oboeruをシェア
       </button>
     </div>
+    <div id="backup-bar">
+      <span class="backup-label">データ</span>
+      <div class="backup-btns">
+        <button class="btn-backup" onclick="exportData()">書き出し</button>
+        <button class="btn-backup" onclick="importData()">読み込み</button>
+      </div>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImportFile(event)">
+    </div>
   </div>
 
   <!-- メインエリア -->

@@ -1212,6 +1212,51 @@ function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+/* ---- データ書き出し／読み込み ---- */
+function exportData() {
+  const data = {
+    texts: getAll(),
+    order: getOrder(),
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `oboeru_backup_${new Date().toLocaleDateString('ja-JP').replace(/\//g,'-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData() {
+  document.getElementById('import-file').click();
+}
+
+function handleImportFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!data.texts) throw new Error();
+      if (!confirm('現在のデータに追加しますか？\n（「キャンセル」で上書きします）')) {
+        setAll(data.texts);
+        if (data.order) setOrder(data.order);
+      } else {
+        const current = getAll();
+        setAll({ ...current, ...data.texts });
+      }
+      renderSidebar();
+      alert('読み込みが完了しました。');
+    } catch {
+      alert('ファイルの形式が正しくありません。');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
 /* ---- シェア ---- */
 function shareApp() {
   const url  = 'https://oboeru.netlify.app/';
