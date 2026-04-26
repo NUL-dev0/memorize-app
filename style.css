@@ -772,6 +772,38 @@ body.typing-mode .btn-section-jump { display: none; }
 .swatch:hover { transform: scale(1.2); }
 .swatch.active { border-color: var(--text); transform: scale(1.15); }
 
+#share-bar {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+}
+
+#btn-share {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-sub);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+#btn-share:hover {
+  background: var(--surface2);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+#btn-share.copied {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 /* ===== テストモード ===== */
 #typing-submodes {
   display: none;

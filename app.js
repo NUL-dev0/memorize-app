@@ -1211,6 +1211,34 @@ function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+/* ---- シェア ---- */
+async function shareApp() {
+  const url  = 'https://oboeru.netlify.app/';
+  const text = '歌詞・セリフ・プレゼン原稿を無料で暗記練習できるWebアプリ「Oboeru」';
+  const btn  = document.getElementById('btn-share');
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'Oboeru', text, url });
+    } catch (e) {
+      if (e.name !== 'AbortError') copyUrl(btn, url);
+    }
+  } else {
+    copyUrl(btn, url);
+  }
+}
+
+function copyUrl(btn, url) {
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> URLをコピーしました';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    prompt('URLをコピーしてください:', url);
+  });
+}
+
 /* ---- テーマ ---- */
 function setTheme(theme) {
   if (theme === 'default') {
