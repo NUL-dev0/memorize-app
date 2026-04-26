@@ -1,0 +1,15 @@
+{
+  "name": "Oboeru｜暗記練習アプリ",
+  "short_name": "Oboeru",
+  "description": "歌詞・セリフ・プレゼン原稿を暗記練習できる無料Webアプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0d0d",
+  "theme_color": "#7c6af7",
+  "lang": "ja",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "favicon.svg",  "sizes": "any",     "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
