@@ -367,6 +367,7 @@ function showForm() {
   document.getElementById('textInput').value  = '';
   document.getElementById('view-form').style.display     = 'flex';
   document.getElementById('view-practice').style.display = 'none';
+  document.body.classList.remove('reveal-mode', 'typing-mode');
   closeSidebar();
   renderSidebar();
 }
