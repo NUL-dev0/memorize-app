@@ -13,11 +13,26 @@ function setAll(data) {
   }
 }
 
+/* ---- 並び順ストレージ ---- */
+function getOrder() {
+  return JSON.parse(localStorage.getItem('memorize_order') || '[]');
+}
+function setOrder(order) {
+  localStorage.setItem('memorize_order', JSON.stringify(order));
+}
+function getOrderedKeys(saved) {
+  const order = getOrder();
+  const savedKeys = Object.keys(saved);
+  const ordered   = order.filter(k => savedKeys.includes(k));
+  const rest      = savedKeys.filter(k => !ordered.includes(k)).sort((a, b) => b - a);
+  return [...ordered, ...rest];
+}
+
 /* ---- サイドバー描画 ---- */
 function renderSidebar() {
   const saved = getAll();
   const el    = document.getElementById('thread-list');
-  const keys  = Object.keys(saved).sort((a, b) => b - a);
+  const keys  = getOrderedKeys(saved);
 
   if (keys.length === 0) {
     el.innerHTML = '<div class="empty-sidebar">まだテキストがありません。<br>「＋ 新しいテキストを追加」から登録してください。</div>';
@@ -27,15 +42,18 @@ function renderSidebar() {
   el.innerHTML = keys.map(id => {
     const item    = saved[id];
     const preview = item.text.replace(/\n/g, ' ').slice(0, 30) + (item.text.length > 30 ? '…' : '');
-    return `<div class="thread-row" data-id="${id}">
+    return `<div class="thread-row" draggable="true" data-id="${id}">
       <div class="thread-delete-bg">
         <button class="thread-delete-btn" onclick="confirmDeleteFromSwipe('${id}')">
           <span>🗑</span><span>削除</span>
         </button>
       </div>
       <div class="thread-item${id === currentId ? ' active' : ''}" onclick="onThreadItemClick(event,'${id}')">
-        <div class="thread-title">${esc(item.title)}</div>
-        <div class="thread-preview">${esc(preview)}</div>
+        <span class="drag-handle" title="ドラッグして並び替え">⠿</span>
+        <div class="thread-content">
+          <div class="thread-title">${esc(item.title)}</div>
+          <div class="thread-preview">${esc(preview)}</div>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -44,6 +62,86 @@ function renderSidebar() {
     initSwipeDelete();
     showSwipeDeleteHint();
   }
+  initDragSort();
+}
+
+/* ---- ドラッグ並び替え ---- */
+function initDragSort() {
+  const list = document.getElementById('thread-list');
+  let dragSrc = null;
+
+  /* デスクトップ：HTML5 drag and drop */
+  document.querySelectorAll('#thread-list .thread-row').forEach(row => {
+    row.addEventListener('dragstart', e => {
+      dragSrc = row;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => row.classList.add('dragging'), 0);
+    });
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+      document.querySelectorAll('#thread-list .drag-over').forEach(el => el.classList.remove('drag-over'));
+    });
+    row.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (row === dragSrc) return;
+      document.querySelectorAll('#thread-list .drag-over').forEach(el => el.classList.remove('drag-over'));
+      row.classList.add('drag-over');
+    });
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      if (!dragSrc || dragSrc === row) return;
+      const mid = row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+      list.insertBefore(dragSrc, e.clientY < mid ? row : row.nextSibling);
+      document.querySelectorAll('#thread-list .drag-over').forEach(el => el.classList.remove('drag-over'));
+      saveSidebarOrder();
+    });
+  });
+
+  /* モバイル：ドラッグハンドルからのタッチドラッグ */
+  let touchEl = null, touchStartY = 0, touchLastY = 0;
+
+  document.querySelectorAll('#thread-list .drag-handle').forEach(handle => {
+    handle.addEventListener('touchstart', e => {
+      e.stopPropagation();
+      touchEl     = handle.closest('.thread-row');
+      touchStartY = e.touches[0].clientY;
+      touchLastY  = touchStartY;
+      touchEl.classList.add('dragging');
+    }, { passive: true });
+  });
+
+  document.addEventListener('touchmove', e => {
+    if (!touchEl) return;
+    e.preventDefault();
+    touchLastY = e.touches[0].clientY;
+    touchEl.style.transform = `translateY(${touchLastY - touchStartY}px)`;
+    document.querySelectorAll('#thread-list .drag-over').forEach(el => el.classList.remove('drag-over'));
+    const rows = Array.from(document.querySelectorAll('#thread-list .thread-row:not(.dragging)'));
+    const target = rows.find(r => {
+      const rect = r.getBoundingClientRect();
+      return touchLastY >= rect.top && touchLastY <= rect.bottom;
+    });
+    if (target) target.classList.add('drag-over');
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (!touchEl) return;
+    touchEl.style.transform = '';
+    touchEl.classList.remove('dragging');
+    const target = document.querySelector('#thread-list .drag-over');
+    if (target) {
+      const mid = target.getBoundingClientRect().top + target.getBoundingClientRect().height / 2;
+      list.insertBefore(touchEl, touchLastY < mid ? target : target.nextSibling);
+      target.classList.remove('drag-over');
+    }
+    saveSidebarOrder();
+    touchEl = null;
+  });
+}
+
+function saveSidebarOrder() {
+  const order = Array.from(document.querySelectorAll('#thread-list .thread-row')).map(r => r.dataset.id);
+  setOrder(order);
 }
 
 /* ---- スレッドアイテムクリック（スワイプ中は閉じるだけ） ---- */
@@ -148,6 +246,7 @@ function confirmDeleteFromSwipe(id) {
     return;
   }
   delete saved[id];
+  setOrder(getOrder().filter(k => k !== id));
   setAll(saved);
   if (currentId === id) {
     currentId = null;
@@ -164,9 +263,15 @@ function saveText() {
   if (!title || !text) { alert('タイトルとテキストを入力してください'); return; }
 
   const saved = getAll();
-  const id    = currentId && saved[currentId] ? currentId : Date.now().toString();
+  const isNew = !(currentId && saved[currentId]);
+  const id    = isNew ? Date.now().toString() : currentId;
   saved[id]   = { id, title, text };
   setAll(saved);
+  if (isNew) {
+    const order = getOrder();
+    order.unshift(id);
+    setOrder(order);
+  }
 
   document.getElementById('titleInput').value = '';
   document.getElementById('textInput').value  = '';
@@ -283,6 +388,7 @@ function editCurrent() {
 function deleteCurrent() {
   if (!confirm('このテキストを削除しますか？')) return;
   const saved = getAll();
+  setOrder(getOrder().filter(k => k !== currentId));
   delete saved[currentId];
   setAll(saved);
   currentId = null;

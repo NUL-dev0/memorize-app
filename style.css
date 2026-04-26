@@ -144,9 +144,32 @@ body {
   cursor: pointer;
   border-left: 3px solid transparent;
   transition: background 0.15s, border-color 0.15s;
-  background: var(--surface); /* スワイプ時に削除ゾーンを隠す */
+  background: var(--surface);
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
+.thread-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.drag-handle {
+  flex-shrink: 0;
+  color: var(--text-sub);
+  opacity: 0.35;
+  font-size: 1rem;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  padding: 4px 2px;
+}
+.drag-handle:active { cursor: grabbing; opacity: 0.7; }
+
+.thread-row.dragging { opacity: 0.45; }
+.thread-row.drag-over { outline: 2px solid var(--accent); border-radius: 8px; }
 
 .thread-item:hover { background: var(--surface2); }
 
