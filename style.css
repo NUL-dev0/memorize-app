@@ -773,8 +773,7 @@ body.typing-mode .btn-section-jump { display: none; }
 .swatch.active { border-color: var(--text); transform: scale(1.15); }
 
 #share-bar {
-  padding: 10px 16px;
-  border-top: 1px solid var(--border);
+  padding: 10px 16px 14px;
 }
 
 #btn-share {
@@ -782,26 +781,22 @@ body.typing-mode .btn-section-jump { display: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 9px 14px;
-  background: transparent;
-  border: 1px solid var(--border);
+  gap: 7px;
+  padding: 9px;
+  background: var(--accent-dim);
+  border: none;
   border-radius: 8px;
-  color: var(--text-sub);
-  font-size: 0.82rem;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: opacity 0.15s;
 }
 
-#btn-share:hover {
-  background: var(--surface2);
-  color: var(--text);
-  border-color: var(--accent);
-}
+#btn-share:hover { opacity: 0.85; }
 
 #btn-share.copied {
-  color: var(--accent);
-  border-color: var(--accent);
+  opacity: 0.7;
 }
 
 /* ===== テストモード ===== */
